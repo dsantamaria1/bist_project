@@ -57,77 +57,136 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
        state <= next_state;
      end
    end 
+ 
+   always @(posedge clk or posedge rst) begin
+     if(rst == 1) begin
+       shift_count <= 0;
+     end 
+     else if(state==s_scan_in) begin
+       shift_count <= shift_count + 1;
+     end
+     else if (state==s_capture) begin
+       shift_count <= 0;
+     end 
+     else if (state==s_scan_out) begin
+       shift_count <= shift_count + 1;
+     end
+     else if(state==s_compare) begin
+       shift_count <= 0;
+     end
+   end
 
+   always @(posedge clk or posedge rst) begin
+     if (rst == 1 && bistmode == 1) begin
+        cut_scanmode_reg <= 1;
+     end
+     else if (rst == 1) begin
+       cut_scanmode_reg <= 0;
+     end
+     else if(state == s_capture || state == s_compare) begin
+       cut_scanmode_reg <= 0;
+     end
+     else if(state == s_scan_in || state == s_scan_out) begin
+       cut_scanmode_reg <= 1;
+     end
+   end
+   
+   always @(posedge clk or posedge rst) begin
+     if (rst == 1) begin
+       pattern_count <= 0;
+     end
+     else if(state==s_capture) begin
+       pattern_count <= pattern_count + 1;
+     end
+     else if(state==s_scan_out) begin
+       pattern_count <= 0;
+     end
+   end
+
+   always @(posedge clk or posedge rst) begin
+     if (rst == 1) begin
+       bistdone_reg <= 0;
+     end
+     else if(state==s_done) begin
+       bistdone_reg<= 1;
+     end
+     else if(state==s_error) begin
+       bistdone_reg <= 1;
+     end
+   end
+
+   always @(posedge clk or posedge rst) begin
+     if (rst == 1) begin
+       bistpass_reg <= 0;
+     end
+     else if(state==s_done) begin
+       bistpass_reg<= 1;
+     end
+     else if(state==s_error) begin
+       bistpass_reg <= 0;
+     end
+   end
    //state machine
-   always @(state) begin //TODO: add other things to sensitivity list
+   always @(state or shift_count) begin //TODO: add other things to sensitivity list
      case(state)
        s_idle: begin
-         if (rst == 1 && bistmode == 1) begin
-           pattern_count = 0;
-           cut_scanmode_reg = 1;
+         $display("s_idle");
+         if(cut_scanmode_reg==1) begin
            next_state = s_scan_in;
-           bistdone_reg = 0;
-           bistpass_reg = 0;
          end
          else begin
-           next_state <= s_idle;
+           next_state = s_idle;
          end
        end
 
        s_scan_in: begin
          if(pattern_count == total_patterns) begin
-           pattern_count = 0;
-           cut_scanmode_reg = 1;
-           state = s_scan_out;
+           $display("s_scan_in 0");
+           next_state = s_scan_out;
          end
          else if(shift_count == shift_done) begin
-           shift_count = 0;
-           state = s_capture;
+           $display("s_scan_in 1");
+           next_state = s_capture;
          end
          else begin
-           cut_scanmode_reg = 1;
-           shift_count = shift_count + 1;
-           state = s_scan_in;
+           $display("s_scan_in 2");
+           next_state = s_scan_in;
          end
        end
 
        s_capture: begin
-         pattern_count = pattern_count + 1;
-         cut_scanmode_reg = 0;
-         state = s_scan_in;
+         $display("s_capture");
+         next_state = s_scan_in;
        end
 
        s_scan_out: begin
+         $display("s_scan_out");
          if(shift_count == shift_done) begin
-           shift_count = 0;
-           cut_scanmode_reg = 0;
-           state = s_compare;
+           next_state = s_compare;
          end
          else begin
-           shift_count = shift_count + 1;
-           state = s_scan_out;
+           next_state = s_scan_out;
          end
        end
  
        s_compare: begin
+         $display("s_compare");
          if(signature == ff_signature) begin
-           state = s_done;
+           next_state = s_done;
          end
          else begin
-           state = s_error;
+           next_state = s_error;
          end
        end
 
        s_done: begin
-         bistdone_reg = 1;
-         bistpass_reg = 1;
-         state = s_idle;
+         $display("s_done");
+         next_state = s_idle;
        end
 
        s_error: begin
-         bistdone_reg = 1;
-         bistpass_reg = 0;
-         state = s_idle;
+         $display("s_error");
+         next_state = s_idle;
        end
     
        default: $display("ERROR: Entered unknown state\n");
