@@ -71,6 +71,7 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
 
        s_test: begin
          if(count == count_max) begin
+           count = 0;
            cut_scanmode_reg = 0;
            state = s_compare;
          end
