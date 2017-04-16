@@ -69,8 +69,8 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
        s_scan_in: begin
          if(count == count_max) begin
            count = 0;
-           cut_scanmode_reg = 0;
-           state = s_compare; //TODO: shift out final pattern results
+           cut_scanmode_reg = 1;
+           state = s_scan_out; //TODO: shift out final pattern results
          end
          else if(shift_count == shift_done) begin
            shift_count = 0;
@@ -87,6 +87,18 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
          count = count + 1;
          cut_scanmode_reg = 0;
          state = s_scan_in;
+       end
+
+       s_scan_out: begin
+         if(shift_count == shift_done) begin
+           shift_count = 0;
+           cut_scanmode_reg = 0;
+           state = s_compare;
+         end
+         else begin
+           shift_count = shift_count + 1;
+           state = s_scan_out;
+         end
        end
  
        s_compare: begin
