@@ -9,7 +9,7 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
   output         cut_sdi;
   input          cut_sdo;
 
-  parameter      s_idle=0, s_test=1;
+  parameter      s_idle=0, s_test=1, s_compare=2, s_done=3, s_error=4;
   parameter      count_max=2000; //number of patterns for bist done
 // Add your code here
   reg [11:0] count;
@@ -44,8 +44,27 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
        end
 
        s_test: begin
+         if(count == count_max) begin
+           state <= s_compare;
+         end
+         else begin
+           state <= s_test;
+         end
+       end
+
+       s_compare: begin
 
        end
+
+       s_done: begin
+
+       end
+
+       s_error: begin
+
+       end
+    
+       default: $display("ERROR: Entered unknown state\n");
      endcase
    end
 endmodule  
