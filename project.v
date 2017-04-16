@@ -11,11 +11,11 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
 
   parameter      s_idle=0, s_test=1, s_compare=2, s_done=3, s_error=4, s_capture=5, s_scan_in=6, s_scan_out=7;
   parameter      shift_done=227;
-  parameter      count_max=2000; //number of patterns for bist done
+  parameter      total_patterns=2000; //number of patterns for bist done
   parameter      ff_signature=16'hdead; //TODO: find correct fault free signature
   parameter      initial_value=16'hbeef;
 // Add your code here
-  reg [11:0] count;
+  reg [11:0] pattern_count;
   reg [7:0]  shift_count;
   reg [3:0]  state;
   reg [3:0]  next_state;
@@ -29,7 +29,9 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
   //TODO: reset cut_scanmode_reg
 
 
-   //always @()
+   always @(posedge clk or posedge rst) begin
+
+   end
   
    //Pattern_generator
    always @(posedge clk or posedge rst) begin
@@ -55,7 +57,7 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
      case(state)
        s_idle: begin
          if (rst == 1 && bistmode == 1) begin
-           count = 0;
+           pattern_count = 0;
            cut_scanmode_reg = 1;
            next_state = s_scan_in;
            bistdone_reg = 0;
@@ -67,10 +69,10 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
        end
 
        s_scan_in: begin
-         if(count == count_max) begin
-           count = 0;
+         if(pattern_count == total_patterns) begin
+           pattern_count = 0;
            cut_scanmode_reg = 1;
-           state = s_scan_out; //TODO: shift out final pattern results
+           state = s_scan_out;
          end
          else if(shift_count == shift_done) begin
            shift_count = 0;
@@ -84,7 +86,7 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
        end
 
        s_capture: begin
-         count = count + 1;
+         pattern_count = pattern_count + 1;
          cut_scanmode_reg = 0;
          state = s_scan_in;
        end
