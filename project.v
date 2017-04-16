@@ -34,7 +34,7 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
        SISR <= initial_value;
      end
      else if(cut_scanmode_reg && pattern_count > 0) begin //ignore first shift out
-       SISR <= {SISR[14:0], SISR[15]^SISR[4]^SISR[3]^SISR[2]^sdo};
+       SISR <= {SISR[14:0], SISR[15]^SISR[4]^SISR[3]^SISR[2]^cut_sdo};
      end
 
    end
