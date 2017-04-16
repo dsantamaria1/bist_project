@@ -39,9 +39,6 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
      else if(cut_scanmode_reg) begin
        LFSR <= {LFSR[14:0], LFSR[15]^LFSR[4]^LFSR[3]^LFSR[2]^LFSR[0]};
      end
-     else begin
-       LFSR <= initial_value;
-     end
    end
 
    always @(posedge clk or posedge rst) begin
