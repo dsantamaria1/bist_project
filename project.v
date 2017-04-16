@@ -20,7 +20,7 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
   reg [3:0]  state;
   reg [3:0]  next_state;
   reg        cut_scanmode_reg, bistdone_reg, bistpass_reg;
-  reg [15:0] signature, LFSR, MISR;
+  reg [15:0] signature, LFSR, SISR;
  
   assign cut_scanmode = cut_scanmode_reg;
   assign bistdone = bistdone_reg;
@@ -53,7 +53,7 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
    end 
 
    //state machine
-   always @(state) begin 
+   always @(state) begin //TODO: add other things to sensitivity list
      case(state)
        s_idle: begin
          if (rst == 1 && bistmode == 1) begin
