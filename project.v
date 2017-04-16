@@ -11,19 +11,22 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
 
   parameter      s_idle=0, s_test=1, s_compare=2, s_done=3, s_error=4;
   parameter      count_max=2000; //number of patterns for bist done
+  parameter      ff_signature=16'hdead; //TODO: find correct fault free signature
 // Add your code here
   reg [11:0] count;
   reg [3:0]  state;
   reg [3:0]  next_state;
-  reg        cut_scanmode_reg;
+  reg        cut_scanmode_reg, bistdone_reg, bistpass_reg;
+  reg [15:0] signature;
  
   assign cut_scanmode = cut_scanmode_reg;
+  assign bistdone = bistdone_reg;
+  assign bistpass = bistpass_reg;
   //TODO: reset cut_scanmode_reg
   //
    always @(posedge clk or posedge rst) begin
      if (rst == 1) begin
        state <= s_idle;
-       count = 0;
      end
      else begin
        state <= next_state;
@@ -31,12 +34,15 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
    end 
 
    //state machine
-   always @(state or bistmode or count) begin 
+   always @(posedge clk) begin 
      case(state)
        s_idle: begin
          if (rst == 1 && bistmode == 1) begin
+           count <= 0;
            cut_scanmode_reg = 1;
            next_state <= s_test;
+           bistdone_reg <= 0;
+           bistpass_reg <= 0;
          end
          else begin
            next_state <= s_idle;
@@ -45,23 +51,34 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
 
        s_test: begin
          if(count == count_max) begin
+           cut_scanmode_reg = 0;
            state <= s_compare;
          end
          else begin
+           count <= count + 1;
            state <= s_test;
          end
        end
 
        s_compare: begin
-
+         if(signature == ff_signature) begin
+           state <= s_done;
+         end
+         else begin
+           state <= s_error;
+         end
        end
 
        s_done: begin
-
+         bistdone_reg <= 1;
+         bistpass_reg <= 1;
+         state <= s_idle;
        end
 
        s_error: begin
-
+         bistdone_reg <= 1;
+         bistpass_reg <= 0;
+         state <= s_idle;
        end
     
        default: $display("ERROR: Entered unknown state\n");
