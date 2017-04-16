@@ -9,9 +9,45 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
   output         cut_sdi;
   input          cut_sdo;
 
-
+  parameter      s_idle=0, s_test=1;
+  parameter      count_max=2000; //number of patterns for bist done
 // Add your code here
+  reg [11:0] count;
+  reg [3:0]  state;
+  reg [3:0]  next_state;
+  reg        cut_scanmode_reg;
+ 
+  assign cut_scanmode = cut_scanmode_reg;
+  //TODO: reset cut_scanmode_reg
+  //
+   always @(posedge clk or posedge rst) begin
+     if (rst == 1) begin
+       state <= s_idle;
+       count = 0;
+     end
+     else begin
+       state <= next_state;
+     end
+   end 
 
+   //state machine
+   always @(state or bistmode or count) begin 
+     case(state)
+       s_idle: begin
+         if (rst == 1 && bistmode == 1) begin
+           cut_scanmode_reg = 1;
+           next_state <= s_test;
+         end
+         else begin
+           next_state <= s_idle;
+         end
+       end
+
+       s_test: begin
+
+       end
+     endcase
+   end
 endmodule  
 
 
