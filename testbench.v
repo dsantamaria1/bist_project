@@ -169,69 +169,70 @@ initial begin
    $write( "\nInjecting No Fault into CUT:  Fault-Free BIST Simulation\n" );
    dobist;
 
-   //force testchip.circuit.II282 = 1;
-   //$write( "\nInjecting Fault into CUT:  testchip.circuit.II282 = 1\n" );
-   //faults = faults+1;
-   //dobist;
-   //release testchip.circuit.II282;
+   force testchip.circuit.II282 = 1;
+   $write( "\nInjecting Fault into CUT:  testchip.circuit.II282 = 1\n" );
+   faults = faults+1;
+   dobist;
+   release testchip.circuit.II282;
 
-   //force testchip.circuit.n482gat = 0;
-   //$write( "\nInjecting Fault into CUT:  testchip.circuit.n482gat = 0\n" );
-   //faults = faults+1;
-   //dobist;
-   //release testchip.circuit.n482gat;
+   force testchip.circuit.n482gat = 0;
+   $write( "\nInjecting Fault into CUT:  testchip.circuit.n482gat = 0\n" );
+   faults = faults+1;
+   dobist;
+   release testchip.circuit.n482gat;
 
-   //force testchip.circuit.n226gat = 1;
-   //$write( "\nInjecting Fault into CUT:  testchip.circuit.n226gat = 1\n" );
-   //faults = faults+1;
-   //dobist;
-   //release testchip.circuit.n226gat;
+   force testchip.circuit.n226gat = 1;
+   $write( "\nInjecting Fault into CUT:  testchip.circuit.n226gat = 1\n" );
+   faults = faults+1;
+   dobist;
+   release testchip.circuit.n226gat;
 
-   //force testchip.circuit.n1275gat = 0;
-   //$write( "\nInjecting Fault into CUT:  testchip.circuit.n1275gat = 0\n" );
-   //faults = faults+1;
-   //dobist;
-   //release testchip.circuit.n1275gat;
+   force testchip.circuit.n1275gat = 0;
+   $write( "\nInjecting Fault into CUT:  testchip.circuit.n1275gat = 0\n" );
+   faults = faults+1;
+   dobist;
+   release testchip.circuit.n1275gat;
 
-   //force testchip.circuit.n1582gat = 1;
-   //$write( "\nInjecting Fault into CUT:  testchip.circuit.n1582gat = 1\n" );
-   //faults = faults+1;
-   //dobist;
-   //release testchip.circuit.n1582gat;
+   force testchip.circuit.n1582gat = 1;
+   $write( "\nInjecting Fault into CUT:  testchip.circuit.n1582gat = 1\n" );
+   faults = faults+1;
+   dobist;
+   release testchip.circuit.n1582gat;
 
-   //force testchip.circuit.II4020 = 0;
-   //$write( "\nInjecting Fault into CUT:  testchip.circuit.II4020 = 0\n " );
-   //faults = faults+1;
-   //dobist;
-   //release testchip.circuit.II4020;
+   force testchip.circuit.II4020 = 0;
+   $write( "\nInjecting Fault into CUT:  testchip.circuit.II4020 = 0\n " );
+   faults = faults+1;
+   dobist;
+   release testchip.circuit.II4020;
 
-   //force testchip.circuit.n745gat = 1;
-   //$write( "\nInjecting Fault into CUT:  testchip.circuit.n745gat = 1\n " );
-   //faults = faults+1;
-   //dobist;
-   //release testchip.circuit.n745gat;
+   force testchip.circuit.n745gat = 1;
+   $write( "\nInjecting Fault into CUT:  testchip.circuit.n745gat = 1\n " );
+   faults = faults+1;
+   dobist;
+   release testchip.circuit.n745gat;
 
-   //force testchip.circuit.n1794gat = 0;
-   //$write( "\nInjecting Fault into CUT:  testchip.circuit.n1794gat = 0\n " );
-   //faults = faults+1;
-   //dobist;
-   //release testchip.circuit.n1794gat;
+   force testchip.circuit.n1794gat = 0;
+   $write( "\nInjecting Fault into CUT:  testchip.circuit.n1794gat = 0\n " );
+   faults = faults+1;
+   dobist;
+   release testchip.circuit.n1794gat;
 
-   //force testchip.circuit.II4623 = 1;
-   //$write( "\nInjecting Fault into CUT:  testchip.circuit.II4623 = 1\n " );
-   //faults = faults+1;
-   //dobist;
-   //release testchip.circuit.II4623;
+   force testchip.circuit.II4623 = 1;
+   $write( "\nInjecting Fault into CUT:  testchip.circuit.II4623 = 1\n " );
+   faults = faults+1;
+   dobist;
+   release testchip.circuit.II4623;
 
-   //force testchip.circuit.II4759 = 0;
-   //$write( "\nInjecting Fault into CUT:  testchip.circuit.II4759 = 0\n " );
-   //faults = faults+1;
-   //dobist;
-   //release testchip.circuit.II4759;
+   force testchip.circuit.II4759 = 0;
+   $write( "\nInjecting Fault into CUT:  testchip.circuit.II4759 = 0\n " );
+   faults = faults+1;
+   dobist;
+   release testchip.circuit.II4759;
 
-   //$write("\nInjected %d faults\n", faults);
-   //$write("Detected %d faults\n", detected_faults);
+   $write("\nInjected %d faults\n", faults);
+   $write("Detected %d faults\n", detected_faults);
 
+   #1000;
    $finish;
 end // initial begin
 
