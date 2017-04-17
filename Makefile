@@ -6,4 +6,4 @@ build:
 	vcs $(FLAGS) -F filelist 
 
 clean:
-	rm -r simv* DVEfiles csrc ucli.key *vcd *vpd opendatabase.log
+	rm -r simv* DVEfiles csrc ucli.key *vpd 
