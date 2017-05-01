@@ -9,7 +9,7 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
   output         cut_sdi;
   input          cut_sdo;
 
-  parameter      s_idle=0, s_test=1, s_compare=2, s_done=3, s_error=4, s_capture=5, s_scan_in=6, s_scan_out=7;
+  parameter      s_idle=0,s_scan_in=1, s_capture=2, s_scan_out=3, s_compare=4, s_pass=5, s_error=7;
   parameter      shift_done=227;
   parameter      total_patterns=2000; //number of patterns for bist done
   parameter      ff_signature=16'h9e77; //TODO: find correct fault free signature
@@ -19,13 +19,13 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
   reg [7:0]  shift_count;
   reg [3:0]  state;
   reg [3:0]  next_state;
-  reg        cut_scanmode_reg, bistdone_reg, bistpass_reg, capture_cycle;
+  reg        cut_scanmode_reg, bistdone_reg, bistpass_reg, capture_cycle, assert_pass;
   reg [15:0] signature, LFSR, SISR;
  
-  assign cut_scanmode = cut_scanmode_reg;
-  assign bistdone = bistdone_reg;
-  assign bistpass = bistpass_reg;
-  assign cut_sdi = LFSR[15];
+  assign #1 cut_scanmode = cut_scanmode_reg;
+  assign #1 bistdone = bistdone_reg;
+  assign #1 bistpass = bistpass_reg;
+  assign #1 cut_sdi = LFSR[15];
   //TODO: reset cut_scanmode_reg
 
 
@@ -118,7 +118,7 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
      if (rst == 1) begin
        bistdone_reg <= 0;
      end
-     else if(state==s_done) begin
+     else if(state==s_pass) begin
        bistdone_reg<= 1;
      end
      else if(state==s_error) begin
@@ -130,7 +130,7 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
      if (rst == 1) begin
        bistpass_reg <= 0;
      end
-     else if(state==s_done) begin
+     else if(assert_pass) begin
        bistpass_reg<= 1;
      end
      else if(state==s_error) begin
@@ -141,8 +141,8 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
    always @(state or shift_count or pattern_count) begin //TODO: add other things to sensitivity list
      case(state)
        s_idle: begin
-         $display("s_idle");
          if(cut_scanmode_reg==1) begin
+           assert_pass <= 0;
            capture_cycle <= 0;
            next_state = s_scan_in;
          end
@@ -185,22 +185,20 @@ module bist_hardware(clk,rst,bistmode,bistdone,bistpass,cut_scanmode,
        end
  
        s_compare: begin
-         $display("s_compare");
          if(SISR == ff_signature) begin
-           next_state = s_done;
+           assert_pass <= 1;
+           next_state = s_pass;
          end
          else begin
            next_state = s_error;
          end
        end
 
-       s_done: begin
-         $display("s_done");
+       s_pass: begin
          next_state = s_idle;
        end
 
        s_error: begin
-         $display("s_error");
          next_state = s_idle;
        end
     
